@@ -1,44 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tar_installer/src/views/desktop_entry_page.dart';
 import 'package:tar_installer/src/widgets/file_path_selector_widget.dart';
 
-class TarSelectionPage extends StatefulWidget {
+class TarSelectionPage extends StatelessWidget {
+
+  static const routeName = '/';
   const TarSelectionPage({super.key});
 
   @override
-  State<TarSelectionPage> createState() => _TarSelectionPageState();
-}
-
-class _TarSelectionPageState extends State<TarSelectionPage> {
-  String selectedFilePath = '';
-  String installLocation = '/opt';
-
-  @override
   Widget build(BuildContext context) {
+    String selectedTARFilePath = '';
+    String installTARLocation = '/opt';
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 12.0,
           children: [
             Text('TAR Location'),
             FilePathSelectorWidget(
-              onFilePathSelected: (String filePath) {
-                setState(() {
-                  selectedFilePath = filePath;
-                });
-              },
+              onFilePathSelected: (filePath) => selectedTARFilePath = filePath,
             ),
             Text('TAR Install Location'),
             FilePathSelectorWidget(
-              initialFilePath: installLocation,
+              initialFilePath: installTARLocation,
               isDirectory: true,
-              onFilePathSelected: (String filePath) {
-                setState(() {
-                  installLocation = filePath;
-                });
-              },
+              onFilePathSelected: (filePath) => installTARLocation = filePath,
             ),
             const Spacer(),
             Row(
@@ -53,17 +44,34 @@ class _TarSelectionPageState extends State<TarSelectionPage> {
                   onPressed: () => SystemChannels.platform.invokeMethod(
                     'SystemNavigator.pop',
                   ),
-                  label: Text('Cancel'),
-                  icon: const Icon(Icons.navigate_before),
+                  label: Text('Exit'),
+                  icon: const Icon(Icons.close),
                 ),
                 const SizedBox(width: 5.0),
                 ElevatedButton.icon(
                   label: Text('Next Page'),
                   icon: const Icon(Icons.navigate_next),
                   onPressed: () {
-                    // Handle installation logic here
-                    debugPrint('Selected TAR file: $selectedFilePath');
-                    debugPrint('Install location: $installLocation');
+                    if (selectedTARFilePath.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please select a TAR file.'),
+                          backgroundColor: Colors.red,
+                          showCloseIcon: true,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+
+                    Navigator.pushNamed(
+                      context,
+                      DesktopEntryPage.routeName,
+                      arguments: {
+                        'selectedTARFilePath': selectedTARFilePath,
+                        'installTARLocation': installTARLocation,
+                      },
+                    );
                   },
                 ),
               ],

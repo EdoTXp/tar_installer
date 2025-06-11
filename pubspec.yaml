@@ -14,13 +14,15 @@ dependencies:
 
   window_manager: ^0.5.0
   file_picker: ^10.1.9
+  archive: ^4.0.7
+  path: ^1.9.1
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

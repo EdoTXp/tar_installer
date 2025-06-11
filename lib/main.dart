@@ -7,11 +7,11 @@ Future<void> main() async {
   await windowManager.ensureInitialized();
 
   final WindowOptions windowOptions = WindowOptions(
-    size: const Size(600, 250),
+    size: const Size(600, 800),
     backgroundColor: Colors.white,
     title: 'TAR Installer',
     skipTaskbar: false,
-    minimumSize: const Size(600, 250),
+    minimumSize: const Size(600, 800),
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {

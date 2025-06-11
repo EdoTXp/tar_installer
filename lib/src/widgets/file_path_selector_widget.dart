@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class FilePathSelectorWidget extends StatefulWidget {
   final String? initialFilePath;
-  final Function(String) onFilePathSelected;
+  final void Function(String selectedPath) onFilePathSelected;
   final bool isDirectory;
 
   const FilePathSelectorWidget({
@@ -18,16 +18,28 @@ class FilePathSelectorWidget extends StatefulWidget {
 }
 
 class _FilePathSelectorWidgetState extends State<FilePathSelectorWidget> {
-  late String _filePath = widget.initialFilePath ?? 'TAR file path';
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: widget.initialFilePath,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   Future<void> _chooseDirectory() async {
     String? directoryPath = await FilePicker.platform.getDirectoryPath(
       initialDirectory: widget.initialFilePath ?? '/home',
     );
     if (directoryPath != null) {
-      setState(() {
-        _filePath = directoryPath;
-      });
+      _controller.text = directoryPath;
       widget.onFilePathSelected(directoryPath);
     }
   }
@@ -39,11 +51,8 @@ class _FilePathSelectorWidgetState extends State<FilePathSelectorWidget> {
       allowedExtensions: ['tar.*'],
     );
     if (result != null && result.files.isNotEmpty) {
-      String filePath = result.files.first.path ?? '';
-      setState(() {
-        _filePath = filePath;
-      });
-      widget.onFilePathSelected(filePath);
+      _controller.text = result.files.first.path ?? '';
+      widget.onFilePathSelected(_controller.text);
     }
   }
 
@@ -54,11 +63,14 @@ class _FilePathSelectorWidgetState extends State<FilePathSelectorWidget> {
       children: [
         Expanded(
           child: TextField(
-            enabled: false,
+            readOnly: true,
+            controller: _controller,
             decoration: InputDecoration(
-              labelText: _filePath,
-              labelStyle: const TextStyle(color: Colors.black),
-              border: OutlineInputBorder(),
+              labelText: widget.isDirectory ? 'Directory Path' : 'File Path',
+              border: const OutlineInputBorder(),
+              hintText: widget.isDirectory
+                  ? 'Select a directory'
+                  : 'Select a TAR file',
             ),
           ),
         ),
